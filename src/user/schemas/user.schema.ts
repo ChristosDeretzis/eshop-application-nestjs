@@ -2,17 +2,30 @@ import * as mongoose from 'mongoose';
 import * as validator from 'validator';
 import * as bcrypt from 'bcrypt';
 
+
 export const UserSchema = new mongoose.Schema({
-    fullName: {
+    firstName: {
         type: String,
-        minlength: 6,
+        minlength: 3,
         maxlength: 255,
-        required: [true, 'NAME_IS_BLANK'],
+        required: [true, 'FIRST_NAME_IS_BLANK'],
+    },
+    lastName: {
+        type: String,
+        minlength: 3,
+        maxlength: 255,
+        required: [true, 'LAST_NAME_IS_BLANK'],
+    },
+    username: {
+        type: String,
+        minlength: 5,
+        maxlength: 255,
+        required: [true, 'USERNAME_IS_BLANK'],
     },
     email: {
         type: String,
         lowercase: true,
-        validate: validator.isEmail,
+        validate: validator.default.isEmail,
         maxlength: 255,
         minlength: 6,
         required: [true, 'EMAIL_IS_BLANK'],
@@ -38,7 +51,7 @@ export const UserSchema = new mongoose.Schema({
     },
     verification: {
         type: String,
-        validate: validator.isUUID,
+        validate: validator.default.isUUID,
     },
     verified: {
         type: Boolean,

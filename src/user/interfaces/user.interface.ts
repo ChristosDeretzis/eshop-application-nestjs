@@ -9,7 +9,7 @@ export interface User extends Document {
     roles: [string];
     verification: string;
     verified: boolean;
-    verificationExpires: boolean;
+    verificationExpires: Date;
     loginAttempts?: number;
     blockExpires?: Date;
     bankAccountNumber?: string;
