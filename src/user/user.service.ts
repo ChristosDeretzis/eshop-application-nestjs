@@ -11,6 +11,7 @@ import { Request } from 'express';
 import { VerifyUuidDto } from './dtos/verify-uuid.dto';
 import { LoginUserDTO } from './dtos/login-user.dto';
 import * as bcrypt from 'bcrypt';
+import { RefreshAccessTokenDto } from './dtos/refresh-access-token.dto';
 
 @Injectable()
 export class UserService {
@@ -60,6 +61,17 @@ export class UserService {
             accessToken: await this.authService.createAccessToken(user._id),
             refreshToken: await this.authService.createRefreshToken(req, user._id),
         }
+    }
+
+    async refreshAccessToken(refreshAccessTokenDto: RefreshAccessTokenDto) {
+        const userId = await this.authService.findRefreshToken(refreshAccessTokenDto.refreshToken);
+        const user = await this.userModel.findById(userId);
+        if(!user) {
+            throw new BadRequestException('Bad Request');
+        }
+        return {
+            accessToken: await this.authService.createAccessToken(user._id),
+        };
     }
 
 

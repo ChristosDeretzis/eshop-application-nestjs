@@ -6,6 +6,7 @@ import { VerifyUuidDto } from './dtos/verify-uuid.dto';
 import { UserService } from './user.service';
 import { Request } from 'express';
 import { LoginUserDTO } from './dtos/login-user.dto';
+import { RefreshAccessTokenDto } from './dtos/refresh-access-token.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -38,5 +39,12 @@ export class UserController {
     @ApiOkResponse({})
     async login(@Req() req: Request, @Body() loginUserDTO: LoginUserDTO) {
         return await this.userService.login(req, loginUserDTO);
+    }
+
+    @Post('refresh-access-token')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({summary: 'Refresh access token with refresh token',})
+    async refreshAccessToken(@Body() refreshAccessTokenDto: RefreshAccessTokenDto) {
+        return await this.userService.refreshAccessToken(refreshAccessTokenDto);
     }
 }
