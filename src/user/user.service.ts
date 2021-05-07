@@ -12,6 +12,8 @@ import { VerifyUuidDto } from './dtos/verify-uuid.dto';
 import { LoginUserDTO } from './dtos/login-user.dto';
 import * as bcrypt from 'bcrypt';
 import { RefreshAccessTokenDto } from './dtos/refresh-access-token.dto';
+import { CreateForgotPasswordDto } from './dtos/create-forgot-password.dto';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
 
 @Injectable()
 export class UserService {
@@ -71,6 +73,34 @@ export class UserService {
         }
         return {
             accessToken: await this.authService.createAccessToken(user._id),
+        };
+    }
+
+    async forgotPassword(req: Request, createForgotPasswordDto: CreateForgotPasswordDto) {
+        await this.findByEmail(createForgotPasswordDto.email);
+        await this.saveForgotPassword(req, createForgotPasswordDto);
+        return {
+            email: createForgotPasswordDto.email,
+            message: 'verification sent'
+        }
+    }
+
+    async forgotPasswordVerify(req: Request, verifyUuidDto: VerifyUuidDto) {
+        const forgotPassword = await this.findForgotPasswordByUuid(verifyUuidDto);
+        await this.setForgotPasswordFirstUsed(req, forgotPassword);
+        return {
+            email: forgotPassword.email,
+            message: 'now reset your password.',
+        };
+    }
+
+    async resetPassword(resetPasswordDto: ResetPasswordDto) {
+        const forgotPassword = await this.findForgotPasswordByEmail(resetPasswordDto);
+        await this.setForgotPasswordFinalUsed(forgotPassword);
+        await this.resetUserPassword(resetPasswordDto);
+        return {
+            email: resetPasswordDto.email,
+            message: 'password successfully changed.',
         };
     }
 
@@ -152,6 +182,75 @@ export class UserService {
 
     private async passwordsAreMatch(user) {
         user.loginAttempts = 0 ;
+        await user.save();
+    }
+
+    private async findByEmail(email: string): Promise<User> {
+        const user = await this.userModel.findOne({email, verified: true});
+        if (!user) {
+            throw new NotFoundException('Email not found.');
+        }
+        return user;
+    }
+
+    private async saveForgotPassword(req: Request, createForgotPasswordDto: CreateForgotPasswordDto) {
+        const forgotPassword = await this.forgotPasswordModel.create({
+            email: createForgotPasswordDto.email,
+            verification: v4(),
+            expires: addHours(new Date(), this.HOURS_TO_VERIFY),
+            ip: this.authService.getIp(req),
+            browser: this.authService.getBrowserInfo(req),
+            country: this.authService.getCountry(req),
+        });
+        await forgotPassword.save();
+    }
+
+    private async findForgotPasswordByUuid(verifyUuidDto: VerifyUuidDto): Promise<ForgotPassword> {
+        const forgotPassword = await this.forgotPasswordModel.findOne({
+            verification: verifyUuidDto.verification,
+            firstUsed: false,
+            finalUsed: false,
+            expires: {$gt: new Date()},
+        });
+        if (!forgotPassword) {
+            throw new BadRequestException('Bad request.');
+        }
+        return forgotPassword;
+    }
+
+    private async setForgotPasswordFirstUsed(req: Request, forgotPassword: ForgotPassword) {
+        forgotPassword.firstUsed = true;
+        forgotPassword.ipChanged = this.authService.getIp(req);
+        forgotPassword.browserChanged = this.authService.getBrowserInfo(req);
+        forgotPassword.countrChanged = this.authService.getCountry(req);
+        await forgotPassword.save();
+    }
+
+    
+    private async findForgotPasswordByEmail(resetPasswordDto: ResetPasswordDto): Promise<ForgotPassword> {
+        const forgotPassword = await this.forgotPasswordModel.findOne({
+            email: resetPasswordDto.email,
+            firstUsed: true,
+            finalUsed: false,
+            expires: {$gt: new Date()},
+        });
+        if (!forgotPassword) {
+            throw new BadRequestException('Bad request.');
+        }
+        return forgotPassword;
+    }
+
+    private async setForgotPasswordFinalUsed(forgotPassword: ForgotPassword) {
+        forgotPassword.finalUsed = true;
+        await forgotPassword.save();
+    }
+
+    private async resetUserPassword(resetPasswordDto: ResetPasswordDto) {
+        const user = await this.userModel.findOne({
+            email: resetPasswordDto.email,
+            verified: true,
+        });
+        user.password = resetPasswordDto.password;
         await user.save();
     }
 
