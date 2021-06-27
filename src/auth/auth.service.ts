@@ -21,11 +21,11 @@ export class AuthService {
         @InjectModel('RefreshToken') private readonly refreshTokenModel: Model<RefreshToken>,
         private readonly jwtService: JwtService
     ) {
-        this.cryptr = new Cryptr(process.env.ENCRYPT_JWT_SECRET);
+        this.cryptr = new Cryptr('YOURJWTENCRIPTINGPASSCHANGEIT');
     }
 
     async createAccessToken(userId: string) {
-        const accessToken = sign({userId}, process.env.JWT_SECRET , { expiresIn: process.env.JWT_EXPIRATION });
+        const accessToken = sign({userId}, 'YOURJWTSECRETCHANGEIT' , { expiresIn: 3000 });
         return this.encryptText(accessToken);
     }
 
@@ -50,7 +50,7 @@ export class AuthService {
     }
 
     async validateUser(jwtPayload: JwtPayload) : Promise<any> {
-        const user = await this.userModel.findOne({id: jwtPayload.userId, verified: true});
+        const user = await this.userModel.findOne({_id: jwtPayload.userId, verified: true});
         if(!user) {
             throw new UnauthorizedException("User not found");
         }
@@ -67,7 +67,7 @@ export class AuthService {
             token = request.body.token.replace(' ', ''); 
         }
 
-        const cryptr = new Cryptr(process.env.ENCRYPT_JWT_SECRET);
+        const cryptr = new Cryptr('YOURJWTENCRIPTINGPASSCHANGEIT');
         if(token) {
             try {
                 token = cryptr.decrypt(token);

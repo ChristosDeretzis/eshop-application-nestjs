@@ -1,16 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiHeader, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { AuthGuard } from '@nestjs/passport';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @ApiTags('Product')
 @Controller('product')
+@UseGuards(RolesGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('admin')
   @ApiOperation({summary: 'Create a product'})
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Bearer',
+    description: 'the token we need for auth'
+  })
   @ApiCreatedResponse({})
   async createProduct(@Body() createProductDto: CreateProductDto) {
     return await this.productService.createProduct(createProductDto);
@@ -35,7 +46,14 @@ export class ProductController {
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('admin')
   @ApiOperation({summary: 'Update a single product'})
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Bearer',
+    description: 'the token we need for auth'
+  })
   @ApiParam({name: 'id', description: 'id of product we want to update'})
   @ApiOkResponse({})
   async updateProduct(
@@ -50,7 +68,14 @@ export class ProductController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('admin')
   @ApiOperation({summary: 'Delete a single product'})
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Bearer',
+    description: 'the token we need for auth'
+  })
   @ApiParam({name: 'id', description: 'id of product we want to delete'})
   @ApiOkResponse({})
   async deleteProduct(@Param("id") productId: string) {
