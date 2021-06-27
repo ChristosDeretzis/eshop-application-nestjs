@@ -14,31 +14,17 @@ export class ProductService {
     const product = new this.productModel(createProductDto);
     await this.isProductUnique(product.name);
     await product.save();
-    return product._id;
+    return this.formatProduct(product);
   }
 
   async getAllProducts() {
     const products = await this.productModel.find().exec();
-    return products.map((product) => ({
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      category: product.category,
-      price: product.price,
-      quantity: product.quantity
-    }));
+    return products.map((product) => this.formatProduct(product));
   }
 
   async getProduct(id: string) {
     const product = await this.findProduct(id);
-    return {
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      category: product.category,
-      price: product.price,
-      quantity: product.quantity
-    };
+    return this.formatProduct(product);
   }
 
   async updateProduct(id: string, name: string, description: string, category: string, price: number, quantity: number) {
@@ -60,13 +46,17 @@ export class ProductService {
     }
 
     await updatedProduct.save();
+
+    return this.formatProduct(updatedProduct);
   }
 
   async deleteProduct(productId: string) {
+    const deletedProduct = await this.findProduct(productId);
     const result = await this.productModel.deleteOne({_id: productId}).exec();
     if (result.n === 0) {
         throw new NotFoundException('Could not find product.');
     }
+    return this.formatProduct(deletedProduct);
 }
 
   private async isProductUnique(name: string) {
@@ -87,5 +77,16 @@ export class ProductService {
     throw new NotFoundException('Could not find product.');
     }
     return product;
-}
+  }
+
+  private formatProduct(prod: Product) {
+    return {
+      id: prod.id,
+      name: prod.name,
+      description: prod.description,
+      category: prod.category,
+      price: prod.price,
+      quantity: prod.quantity
+    };
+  }
 }
