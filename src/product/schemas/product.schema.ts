@@ -6,7 +6,8 @@ export const ProductSchema = new mongoose.Schema({
         type: String,
         minLength: 3,
         maxLength: 255,
-        required: true
+        required: true,
+        unique: true
     }, 
     description: {
         type: String,
