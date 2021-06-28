@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Request } from 'express';
 import { Model } from 'mongoose';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Product } from './interfaces/product.interface';
@@ -17,8 +18,18 @@ export class ProductService {
     return this.formatProduct(product);
   }
 
-  async getAllProducts() {
-    const products = await this.productModel.find().exec();
+  async getAllProducts(req: Request) {
+    const sort = {}
+    if(req.query.sortBy){
+      const parts = req.query.sortBy.toString().split("_");
+      sort[parts[0]] = (parts[1] === 'desc' ? -1 : 1);
+    }
+    const products = await this.productModel
+                    .find()
+                    .limit(Number(req.query.limit))
+                    .skip(Number(req.query.skip))
+                    .sort(sort).exec();
+                    
     return products.map((product) => this.formatProduct(product));
   }
 

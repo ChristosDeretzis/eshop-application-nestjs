@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiHeader, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Request } from 'express';
 
 @ApiTags('Product')
 @Controller('product')
@@ -31,8 +32,8 @@ export class ProductController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({summary: 'Get all Products'})
   @ApiOkResponse({})
-  async getProducts() {
-    return await this.productService.getAllProducts();
+  async getProducts(@Req() req: Request) {
+    return await this.productService.getAllProducts(req);
   }
 
   @Get(':id')
