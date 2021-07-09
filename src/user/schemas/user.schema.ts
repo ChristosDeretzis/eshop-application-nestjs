@@ -74,6 +74,8 @@ export const UserSchema = new mongoose.Schema({
     timestamps: true,
 });
 
+exports.User = mongoose.model('User', UserSchema);
+
 UserSchema.pre('save', async function(next: mongoose.HookNextFunction) {
     try {
       if (!this.isModified('password')) {

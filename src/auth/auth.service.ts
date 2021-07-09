@@ -21,11 +21,11 @@ export class AuthService {
         @InjectModel('RefreshToken') private readonly refreshTokenModel: Model<RefreshToken>,
         private readonly jwtService: JwtService
     ) {
-        this.cryptr = new Cryptr('YOURJWTENCRIPTINGPASSCHANGEIT');
+        this.cryptr = new Cryptr(process.env.ENCRYPT_JWT_SECRET);
     }
 
     async createAccessToken(userId: string) {
-        const accessToken = sign({userId}, 'YOURJWTSECRETCHANGEIT' , { expiresIn: 3000 });
+        const accessToken = sign({userId}, process.env.JWT_SECRET , { expiresIn: process.env.JWT_EXPIRATION });
         return this.encryptText(accessToken);
     }
 
@@ -67,7 +67,7 @@ export class AuthService {
             token = request.body.token.replace(' ', ''); 
         }
 
-        const cryptr = new Cryptr('YOURJWTENCRIPTINGPASSCHANGEIT');
+        const cryptr = new Cryptr(process.env.ENCRYPT_JWT_SECRET);
         if(token) {
             try {
                 token = cryptr.decrypt(token);

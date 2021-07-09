@@ -29,7 +29,6 @@ export class ProductService {
                     .limit(Number(req.query.limit))
                     .skip(Number(req.query.skip))
                     .sort(sort).exec();
-                    
     return products.map((product) => this.formatProduct(product));
   }
 
