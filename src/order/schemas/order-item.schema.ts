@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 
-const orderItemSchema = new mongoose.Schema({
+export const OrderItemSchema = new mongoose.Schema({
     quantity: {
         type: Number,
         required: true
@@ -11,4 +11,4 @@ const orderItemSchema = new mongoose.Schema({
     }
 });
 
-exports.OrderItem = mongoose.model('OrderItem', orderItemSchema);
+exports.OrderItem = mongoose.model('OrderItem', OrderItemSchema);
