@@ -47,9 +47,9 @@ export class ProductController {
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({summary: 'Update a single product'})
   @UseGuards(AuthGuard('jwt'))
   @Roles('admin')
-  @ApiOperation({summary: 'Update a single product'})
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Bearer',
