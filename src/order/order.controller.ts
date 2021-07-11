@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, HttpCode, HttpStatus, Param, Patch, Post, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { OrderDto } from './dto/order.dto';
@@ -31,5 +31,13 @@ export class OrderController {
   @ApiOkResponse({}) 
   async deleteOrder(@Param("id") orderId: string) {
     return this.orderService.deleteOrder(orderId);
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({summary: 'Delete an order'})
+  @ApiOkResponse({}) 
+  async getAllOrders() {
+    return this.orderService.getAllOrders();
   }
 }

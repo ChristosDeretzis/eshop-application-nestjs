@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
 import { Model } from 'mongoose';
@@ -65,7 +65,6 @@ export class OrderService {
         if(!order) {
             throw new NotFoundException("The order cannot be updated");
         }
-
         return order;
     }
 
@@ -75,7 +74,16 @@ export class OrderService {
         if (result.n === 0) {
             throw new NotFoundException('Could not find product.');
         }
-
         return deletedOrder;
+    }
+
+    async getAllOrders() {
+        const orderList = await this.orderModel.find().populate('user', 'name').sort({'dateOrdered': -1});
+
+        if(!orderList){
+            throw new BadGatewayException("There is no list of orders");
+        }
+
+        return orderList;
     }
 }
