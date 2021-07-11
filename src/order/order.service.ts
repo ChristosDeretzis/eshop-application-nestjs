@@ -132,4 +132,14 @@ export class OrderService {
 
         return {"totalSales": totalSales.pop().totalsales};
     }
+
+    async getTotalNumberOfOrders() {
+        const orderCount = await this.orderModel.countDocuments((count) => count);
+
+        if(!orderCount) {
+            throw new BadGatewayException("There was an error during counting the documents");
+        }
+
+        return {"orderCount": orderCount};
+    }
 }

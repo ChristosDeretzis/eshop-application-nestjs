@@ -64,4 +64,12 @@ export class OrderController {
   async getTotalSales() {
     return this.orderService.getTotalSales();
   }
+
+  @Get('/get/count')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({summary: 'Get total number of orders'})
+  @ApiOkResponse({})
+  async getTotalNumberOfOrders() {
+    return this.orderService.getTotalNumberOfOrders();
+  }
 }
