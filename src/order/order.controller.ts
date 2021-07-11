@@ -35,9 +35,17 @@ export class OrderController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({summary: 'Delete an order'})
+  @ApiOperation({summary: 'Get all orders'})
   @ApiOkResponse({}) 
   async getAllOrders() {
     return this.orderService.getAllOrders();
+  }
+
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({summary: 'Get a single order'})
+  @ApiOkResponse({}) 
+  async getSingleOrder(@Param("id") orderId: string) {
+    return this.orderService.getSingleOrder(orderId);
   }
 }

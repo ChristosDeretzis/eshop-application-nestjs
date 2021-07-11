@@ -78,12 +78,28 @@ export class OrderService {
     }
 
     async getAllOrders() {
-        const orderList = await this.orderModel.find().populate('user', 'name').sort({'dateOrdered': -1});
+        const orderList = await this.orderModel.find().populate('user', 'username').sort({'dateOrdered': -1});
 
         if(!orderList){
             throw new BadGatewayException("There is no list of orders");
         }
 
         return orderList;
+    }
+
+    async getSingleOrder(orderId: string) {
+        const order = await this.orderModel.findById(orderId)
+        .populate('user', 'username')
+        .populate({
+            path: 'orderItems', populate: {
+                path: 'product', polulate: 'name'
+            }
+        });
+
+        if(!order) {
+            throw new BadGatewayException("Order was not found");
+        }
+
+        return order;
     }
 }
