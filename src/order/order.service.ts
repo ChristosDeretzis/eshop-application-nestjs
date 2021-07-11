@@ -68,4 +68,14 @@ export class OrderService {
 
         return order;
     }
+
+    async deleteOrder(orderId: string) {
+        const deletedOrder = await this.orderModel.findById(orderId);
+        const result = await this.orderModel.deleteOne({_id: orderId}).exec();
+        if (result.n === 0) {
+            throw new NotFoundException('Could not find product.');
+        }
+
+        return deletedOrder;
+    }
 }
