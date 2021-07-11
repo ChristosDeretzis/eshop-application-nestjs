@@ -56,4 +56,12 @@ export class OrderController {
   async getUserOrders(@Param("id") userId: string) {
     return this.orderService.getUserOrders(userId);
   }
+
+  @Get('/get/totalSales')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({summary: 'Get total sales from all orders'})
+  @ApiOkResponse({})
+  async getTotalSales() {
+    return this.orderService.getTotalSales();
+  }
 }

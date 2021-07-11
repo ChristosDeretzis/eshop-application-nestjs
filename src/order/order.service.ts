@@ -120,4 +120,16 @@ export class OrderService {
 
         return userOrderList;
     }
+
+    async getTotalSales() {
+        const totalSales = await this.orderModel.aggregate([
+            { $group: { _id: null, totalsales: { $sum: "$totalPrice" } } }
+        ]);
+
+        if(!totalSales) {
+            throw new NotFoundException("The sales could not be generated");
+        }
+
+        return {"totalSales": totalSales.pop().totalsales};
+    }
 }
