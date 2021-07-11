@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Patch, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrderDto } from './dto/order.dto';
 import { OrderService } from './order.service';
@@ -14,5 +14,10 @@ export class OrderController {
   @ApiCreatedResponse({})
   async createOrder(@Body() orderDto: OrderDto) {
     return this.orderService.createOrder(orderDto);
+  }
+
+  @Patch(':id')
+  async updateOrder() {
+    return this.orderService.updateOrder();
   }
 }

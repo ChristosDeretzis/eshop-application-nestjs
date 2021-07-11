@@ -13,6 +13,13 @@ export const OrderItemSchema = new mongoose.Schema({
     }
 });
 
+const shippingSchema = {
+    address: { type: String, required: true },
+    city: { type: String, required: true },
+    postalCode: { type: String, required: true },
+    country: { type: String, required: true },
+  };
+
 export const OrderSchema = new mongoose.Schema({
     orderItems: [OrderItemSchema],
     totalPrice: {
@@ -22,6 +29,7 @@ export const OrderSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
     },
+    shipping: shippingSchema,
     dateOrdered: {
         type: Date,
         default: Date.now,

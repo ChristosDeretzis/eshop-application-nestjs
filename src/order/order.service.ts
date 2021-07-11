@@ -44,11 +44,16 @@ export class OrderService {
         const newOrder = new this.orderModel({
             orderItems: orderItemsResolved,
             user: orderDto.user,
-            totalPrice: totalPrice
+            totalPrice: totalPrice,
+            shipping: orderDto.shipping
         });
 
         await newOrder.save()
 
         return newOrder.toJSON();
+    }
+
+    async updateOrder() {
+
     }
 }

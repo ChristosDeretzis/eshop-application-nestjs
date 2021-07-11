@@ -14,3 +14,10 @@ interface OrderItem extends Document{
     quantity: number
 }
 
+interface Address extends Document {
+    address: string,
+    city: string,
+    postalCode: string,
+    country: string
+}
+
