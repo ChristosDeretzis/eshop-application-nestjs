@@ -48,4 +48,12 @@ export class OrderController {
   async getSingleOrder(@Param("id") orderId: string) {
     return this.orderService.getSingleOrder(orderId);
   }
+
+  @Get('/get/userorders/:id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({summary: 'Get orders of a user'})
+  @ApiOkResponse({})
+  async getUserOrders(@Param("id") userId: string) {
+    return this.orderService.getUserOrders(userId);
+  }
 }

@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
 import { Model } from 'mongoose';
 import { Product } from 'src/product/interfaces/product.interface';
+import { User } from 'src/user/interfaces/user.interface';
 import { OrderDto } from './dto/order.dto';
 import { Order } from './interfaces/order.interface';
 
@@ -11,7 +12,8 @@ export class OrderService {
 
     constructor(
         @InjectModel('Order') private readonly orderModel: Model<Order>, 
-        @InjectModel('Product') private readonly productModel: Model<Product>){}
+        @InjectModel('Product') private readonly productModel: Model<Product>,
+        @InjectModel('User') private readonly userModel: Model<User>){}
 
     async createOrder(orderDto: OrderDto){
         const orderItems = Promise.all(orderDto.products.map((orderItem) =>{
@@ -101,5 +103,21 @@ export class OrderService {
         }
 
         return order;
+    }
+
+    async getUserOrders(userId: string) {
+        const user = await this.userModel.findById(userId);
+        const userOrderList = await this.orderModel.find({user: user})
+        .populate({
+            path: 'orderItems', populate: {
+                path: 'product', polulate: 'name'
+            }
+        }).sort({'dateOrdered': -1});
+
+        if(!userOrderList) {
+            throw new BadGatewayException("There is no list of orders for this user");
+        }
+
+        return userOrderList;
     }
 }
