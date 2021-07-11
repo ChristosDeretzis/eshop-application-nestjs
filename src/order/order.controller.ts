@@ -1,5 +1,6 @@
-import { Body, Controller, HttpCode, HttpStatus, Patch, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, HttpCode, HttpStatus, Param, Patch, Post, Req } from '@nestjs/common';
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { OrderDto } from './dto/order.dto';
 import { OrderService } from './order.service';
 
@@ -17,7 +18,10 @@ export class OrderController {
   }
 
   @Patch(':id')
-  async updateOrder() {
-    return this.orderService.updateOrder();
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({summary: 'Update an existing order'})
+  @ApiOkResponse({}) 
+  async updateOrder(@Param("id") orderId: string, @Req() req: Request) {
+    return this.orderService.updateOrder(orderId, req);
   }
 }

@@ -1,5 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Request } from 'express';
 import { Model } from 'mongoose';
 import { Product } from 'src/product/interfaces/product.interface';
 import { OrderDto } from './dto/order.dto';
@@ -12,7 +13,7 @@ export class OrderService {
         @InjectModel('Order') private readonly orderModel: Model<Order>, 
         @InjectModel('Product') private readonly productModel: Model<Product>){}
 
-    async createOrder(orderDto: OrderDto) {
+    async createOrder(orderDto: OrderDto){
         const orderItems = Promise.all(orderDto.products.map((orderItem) =>{
             let newOrderItem = {
                 quantity: orderItem.quantity,
@@ -53,7 +54,18 @@ export class OrderService {
         return newOrder.toJSON();
     }
 
-    async updateOrder() {
+    async updateOrder(orderId: string, req: Request) {
+        const order = await this.orderModel.findByIdAndUpdate(
+            orderId, 
+            {
+                status: req.body.status
+            },
+            { new: true }
+        );
+        if(!order) {
+            throw new NotFoundException("The order cannot be updated");
+        }
 
+        return order;
     }
 }

@@ -27,4 +27,11 @@ export class OrderDto {
     })
     @IsNotEmpty()
     readonly shipping: ShippingDto;
+
+    @ApiProperty({
+        example: "Pending",
+        description: "The status of the order",
+        format: "string"
+    })
+    readonly status: string;
 }

@@ -30,6 +30,11 @@ export const OrderSchema = new mongoose.Schema({
         ref: 'User',
     },
     shipping: shippingSchema,
+    status: {
+        type: String,
+        required: true,
+        default: 'Pending'
+    },
     dateOrdered: {
         type: Date,
         default: Date.now,
